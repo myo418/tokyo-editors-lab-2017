@@ -1,0 +1,34 @@
+mysql_sub:
+  host: us-cdbr-iron-east-03.cleardb.net
+  db: heroku_8b86e301c60d9dd
+  user: b000b890276749
+  password: 
+mysql:
+  host: mmyojin-member-1.mdb.kks.ynwm.yahoo.co.jp
+  db: article_map
+  user: mmyojin
+  password:
+datafile:
+  -
+    path: ./data/asahi_utf8.tsv
+    media_name: 朝日
+  -
+    path: ./data/mainichi_utf8.tsv
+    media_name: 毎日
+  -
+    path: ./data/nikkei_utf8.tsv
+    media_name: 日経
+  -
+    path: ./data/sankei_utf8.tsv
+    media_name: 産経
+  -
+    path: ./data/yomiuri_utf8.tsv
+    media_name: 読売
+goo:
+  app_id:
+  app_subid:
+  entityUrl: https://labs.goo.ne.jp/api/entity
+  morphemeUrl: https://labs.goo.ne.jp/api/morph
+google:
+  key:
+  placeUrl: https://maps.googleapis.com/maps/api/place/textsearch/json

@@ -1,0 +1,363 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width; initial-scale=1; maximum-scale=1;">
+    <title>Disaster Coverage Network</title>
+        <link rel="stylesheet" href="pure-drawer.min.css">
+    <script type="text/javascript" src="./node_modules/jquery/dist/jquery.js"></script>
+    
+        <style>
+          /* Always set the map height explicitly to define the size of the div
+           * element that contains the map. */
+          #map {
+            height: 100%;
+          }
+          /* Optional: Makes the sample page fill the window. */
+          html, body {
+            height: 92%;
+            margin: 0;
+            padding: 0;
+          }
+    
+    <link rel="stylesheet" href="ionicons-2.0.1/css/ionicons.min.css">
+    
+    
+      .inner {
+        width: 90%;
+        max-width: 1024px;
+        margin: 0 auto;
+      }
+      img {
+        max-width: 100%;
+      }
+      p {
+        margin-bottom: 3em;
+      }
+      li {
+        list-style: none;
+        color: #fff;
+        font-size: 1.2em;
+        margin-bottom: 1.2em;
+      }
+      .btn {
+        color: #fff;
+        display: block;
+        width: 60%;
+        padding: 24px 0;
+        text-align: center;
+        margin: 24px auto;
+        background-color: #888;
+      }
+      .pure-drawer {
+        background-color: #243040;
+      }
+      .pure-toggle-label {
+        border: none;
+      }
+      .pure-toggle-label .pure-toggle-icon,
+      .pure-toggle-label .pure-toggle-icon:before,
+      .pure-toggle-label .pure-toggle-icon:after {
+        background-color: #002175;
+      }
+      .pure-toggle-label:hover .pure-toggle-icon,
+      .pure-toggle-label:hover .pure-toggle-icon:before,
+      .pure-toggle-label:hover .pure-toggle-icon:after {
+        background-color: #8a8c8c;
+      }
+      nav.pure-drawer {
+        padding-top: 100px;
+      }
+    
+    
+        </style>
+
+</head>
+
+<body>
+<header>
+<img src="dcn_ver4.png" alt="dcn" align="middle" hspace="60">
+  <!--
+  bounce
+  fade
+  fall
+  flipX
+  flipY
+  push
+  reveal
+  reverseSlide
+  scaleDown
+  scaleRotate
+  scaleUp
+  slide
+  slideAlong
+  zoom
+  -->
+<div class="pure-container" data-effect="pure-effect-scaleRotate">
+  <input type="checkbox" id="pure-toggle-left" class="pure-toggle" data-toggle="left"/>
+  <label class="pure-toggle-label" for="pure-toggle-left" data-toggle-label="left"><span class="pure-toggle-icon"></span></label>
+
+  <nav class="pure-drawer" data-position="left">
+    <ul>
+      <li>記事一覧</li>
+      <li>交通情報</li>
+      <li>プレスリリース</li>
+      <li>Yahoo!天気・災害</li>
+      <li>ヘルプ</li>
+      <li>設定</li>
+      </ul>
+  </nav>
+
+
+<label class="pure-overlay" for="pure-toggle-left" data-overlay="left"></label>
+</div>
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="form-group">
+          <div class="select-wrap select-primary">
+           <select name="" id="selector" onChange="loadArticles()">
+            <option value="2016-04-15 05:00:00">2016.04.15 朝刊</option>
+            <option value="2016-04-15 17:00:00">2016.04.15 夕刊</option>
+            <option value="2016-04-16 05:00:00" selected="selected">2016.04.16 朝刊</option>
+            <option value="2016-04-16 17:00:00">2016.04.16 夕刊</option>
+            <option value="2016-04-17 05:00:00">2016.04.17 朝刊</option>
+            <option value="2016-04-17 17:00:00">2016.04.17 夕刊</option>
+            <option value="2016-04-18 05:00:00">2016.04.18 朝刊</option>
+            <option value="2016-04-18 17:00:00">2016.04.18 夕刊</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</header>
+<div id="map"></div>
+<script>
+    function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 12,
+            center: {lat: 32.80589, lng: 130.69181},
+            styles: style
+        });
+
+        loadArticles();
+        addTweet();
+    }
+    
+    function addTweet(){
+        var image = {
+            url: './tw.png',
+            size: new google.maps.Size(100, 100),
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(0, 50),
+            scaledSize: new google.maps.Size(100, 100),
+        };
+
+        var words = [
+            {
+                word: 'ライオン',
+                lat: 32.8,
+                lng: 130.6
+            },
+            {
+                word: '火事',
+                lat: 32.9,
+                lng: 130.7
+            },
+            {
+                word: '泥棒',
+                lat: 32.7,
+                lng: 130.8
+            },
+        ];
+
+        for (var i = 0; i < words.length; i++) {
+            var marker = new google.maps.Marker({
+                position: {lat: words[i]['lat'], lng: words[i]['lng']},
+                map: map,
+                icon: image,
+                zIndex: 5,
+                label: {
+                    text: words[i]['word'],
+                    color: "white" ,
+                    fontSize: "16px" ,
+                }
+            });
+        }
+    }
+
+    function setMapOnAll(map) {
+        for (var i = 0; i < markers.length; i++) {
+            markers[i].setMap(map);
+        }
+    }
+
+    // Removes the markers from the map, but keeps them in the array.
+    function clearMarkers() {
+        setMapOnAll(null);
+    }
+
+    markers = [];
+    function setMarkers(data) {
+        var image = {
+            url: './mapin.png',
+            size: new google.maps.Size(100, 100),
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(0, 50),
+            scaledSize: new google.maps.Size(100, 100),
+        };
+        for (var i = 0; i < data['results'].length; i++) {
+            var beach =  data['results'][i];
+            /*
+            var wordArray = [];
+            for (var j = 0; j < beach['data'].length && wordArray.length < 3; j++) {
+                if(beach['data'][j][0].length < 6) {
+                    wordArray.push(encodeURIComponent(beach['data'][j][0]));
+                }
+            }
+
+            var str = wordArray.join('|');
+            var imageText = {
+                url: 'https://chart.googleapis.com/chart?chst=d_text_outline&chld=FFFFFF|56|h|FFFFFF|_|' + str,
+                size: new google.maps.Size(100, 100),
+                //origin: new google.maps.Point(0, 0),
+                anchor: new google.maps.Point(0, 50),
+                scaledSize: new google.maps.Size(80, 80),
+            };
+            */
+
+            var marker = new google.maps.Marker({
+                position: {lat: beach['location']['lat'], lng: beach['location']['lng']},
+                map: map,
+                icon: image,
+                zIndex: 5,
+                label: {
+                    text: beach['data'][0][0],
+                    color: "white" ,
+                    fontSize: "16px" ,
+                }
+            });
+            markers.push(marker);
+
+
+            google.maps.event.addListener(marker, 'click', (function(url){
+                return function(){ location.href = url; };
+            })('http://0.0.0.0:5000/list?word=' + encodeURIComponent(beach['word'])));
+
+            /*
+            var marker = new google.maps.Marker({
+                position: {lat: beach['location']['lat'], lng: beach['location']['lng']},
+                map: map,
+                icon: imageText,
+                zIndex: 6
+            });
+            */
+        }
+    }
+
+    function loadArticles() {
+        clearMarkers();
+        var e = document.getElementById("selector");
+        var strUser = e.options[e.selectedIndex].value;
+        var apiUrl = 'http://0.0.0.0:5000/';
+
+        var latlng = map.getCenter();
+        var lat = latlng.lat();
+        var lng = latlng.lng();
+        var date = strUser;
+        $.ajax({
+            type: "GET",
+            url: apiUrl,
+            data: { lat: lat, lng: lng, date: strUser }
+        }).done(function( msg ) {
+            console.log(msg);
+            setMarkers(msg)
+        });
+    }
+
+    var style = [
+        {
+            "featureType": "administrative",
+            "elementType": "labels.text.fill",
+            "stylers": [
+                {
+                    "color": "#444444"
+                }
+            ]
+        },
+        {
+            "featureType": "landscape",
+            "elementType": "all",
+            "stylers": [
+                {
+                    "color": "#f2f2f2"
+                }
+            ]
+        },
+        {
+            "featureType": "poi",
+            "elementType": "all",
+            "stylers": [
+                {
+                  "visibility": "off"
+              }
+          ]
+        },
+        {
+            "featureType": "road",
+            "elementType": "all",
+            "stylers": [
+                {
+                    "saturation": -100
+                },
+                {
+                    "lightness": 45
+                }
+            ]
+        },
+        {
+            "featureType": "road.highway",
+            "elementType": "all",
+            "stylers": [
+                {
+                    "visibility": "simplified"
+                }
+            ]
+        },
+        {
+            "featureType": "road.arterial",
+            "elementType": "labels.icon",
+            "stylers": [
+                {
+                    "visibility": "off"
+                }
+            ]
+        },
+        {
+            "featureType": "transit",
+            "elementType": "all",
+            "stylers": [
+                {
+                    "visibility": "off"
+                }
+            ]
+        },
+        {
+            "featureType": "water",
+            "elementType": "all",
+            "stylers": [
+                {
+                    "color": "#46bcec"
+                },
+                {
+                    "visibility": "on"
+                }
+            ]
+        }
+    ];
+</script>
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5vro5lZUwaGRiFYMdAL3l7iycy2HqlJw&callback=initMap">
+</script>
+</body>
+</html>
